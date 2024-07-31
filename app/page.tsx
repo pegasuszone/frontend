@@ -1,113 +1,341 @@
-import Image from "next/image";
+'use client'
+
+import { Collection } from '@/__generated__/graphql'
+import NFT from '@/components/app/NFT'
+import Spinner from '@/components/app/Spinner'
+import WalletModal from '@/components/app/WalletModal'
+import { Button } from '@/components/catalyst/button'
+import { Divider } from '@/components/catalyst/divider'
+import { Heading } from '@/components/catalyst/heading'
+import {
+  Pagination,
+  PaginationList,
+  PaginationNext,
+  PaginationPage,
+  PaginationPrevious,
+} from '@/components/catalyst/pagination'
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/catalyst/table'
+import { Text } from '@/components/catalyst/text'
+import { useTrade } from '@/contexts/trade'
+import GET_OWNED_TOKENS from '@/graphql/owned-tokens'
+import GET_PROFILE from '@/graphql/profile'
+import { CHAIN_ID } from '@/utils/constants'
+import { demod, formatCurrency, mod, truncateAddress } from '@/utils/format'
+import { useQuery } from '@apollo/client'
+import { UserIcon } from '@heroicons/react/20/solid'
+import clsx from 'clsx'
+import { useAccount, useConnect } from 'graz'
+import { useCallback, useMemo, useState } from 'react'
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+  const { data: account, isConnected } = useAccount()
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false)
+  const { connect } = useConnect()
+
+  const {
+    loading: isLoadingProfile,
+    error,
+    data: profile,
+  } = useQuery(GET_PROFILE, {
+    variables: { address: account?.bech32Address || '' },
+  })
+
+  const [tokenPage, setTokenPage] = useState<number>(1)
+  const tokenOffset = useMemo(() => {
+    return (tokenPage - 1) * 7
+  }, [tokenPage])
+
+  const { loading: isLoadingAllTokens, data: allTokens } = useQuery(
+    GET_OWNED_TOKENS,
+    {
+      variables: { owner: account?.bech32Address || '', limit: 10000 },
+    }
+  )
+
+  const { loading: isLoadingTokens, data: tokens } = useQuery(
+    GET_OWNED_TOKENS,
+    {
+      variables: {
+        owner: account?.bech32Address || '',
+        limit: 7,
+        offset: tokenOffset,
+      },
+    }
+  )
+
+  const collections: Collection[] = useMemo(() => {
+    if (!allTokens) return []
+    const rawCollections = allTokens.tokens?.tokens.map((token) => {
+      return token.collection
+    })
+    if (!rawCollections) return []
+
+    const reducedCollections = rawCollections.reduce<Collection[]>(
+      (accumulator, current) => {
+        if (
+          !accumulator.some(
+            (item) => item.contractAddress === current.contractAddress
+          )
+        ) {
+          accumulator.push(current)
+        }
+        return accumulator
+      },
+      []
+    )
+
+    return reducedCollections
+  }, [allTokens])
+
+  const selectedCollections = useMemo(
+    () => new Map<string, undefined>(),
+    [account]
+  )
+  const [
+    selectedCollectionsRefreshCounter,
+    setSelectedCollectionsRefreshCounter,
+  ] = useState<number>(0)
+  const refreshSelectedCollections = useCallback(
+    () =>
+      setSelectedCollectionsRefreshCounter(
+        selectedCollectionsRefreshCounter + 1
+      ),
+    [selectedCollectionsRefreshCounter, setSelectedCollectionsRefreshCounter]
+  )
+
+  const toggleCollection = (collectionAddress: string) => {
+    setTokenPage(1)
+    switch (selectedCollections.has(collectionAddress)) {
+      case true:
+        selectedCollections.delete(collectionAddress)
+        break
+      case false:
+        selectedCollections.set(collectionAddress, undefined)
+        break
+    }
+    refreshSelectedCollections()
+  }
+
+  const { loading: isLoadingTokensByCollection, data: tokensByCollection } =
+    useQuery(GET_OWNED_TOKENS, {
+      variables: {
+        owner: account?.bech32Address || '',
+        limit: 7,
+        offset: tokenOffset,
+        filterByCollectionAddrs: collections
+          .filter((collection) =>
+            selectedCollections.has(collection.contractAddress)
+          )
+          .map((collection) => collection.contractAddress),
+      },
+    })
+
+  const filteredTokens = useMemo(
+    () => (selectedCollections.size > 0 ? tokensByCollection : tokens),
+    [selectedCollections, tokensByCollection, tokens]
+  )
+
+  const isLoadingFilteredTokens = useMemo(
+    () =>
+      selectedCollections.size > 0
+        ? isLoadingTokensByCollection
+        : isLoadingTokens,
+    [selectedCollections, isLoadingTokensByCollection, isLoadingTokens]
+  )
+
+  const { selectedUserTokens: selectedTokens, toggleUserToken: toggleToken } =
+    useTrade()
+
+  return isConnected && !!profile ? (
+    <main className="w-screen !mx-0 !max-w-full">
+      <div className="flex flex-row space-x-6 items-center">
+        {profile.wallet?.name ? (
+          <img
+            src={profile.wallet?.name?.media?.visualAssets?.lg?.url as string}
+            alt={profile?.wallet?.name?.name}
+            className="w-16 h-16 rounded-md"
+          />
+        ) : (
+          <div className="bg-zinc-950/10 dark:bg-white/10 flex items-center justify-center w-16 h-16 rounded-md">
+            <UserIcon className="text-zinc-950/50 dark:text-white/50 w-6 h-6" />
+          </div>
+        )}
+        <div className="flex flex-row space-x-3 items-center">
+          <Heading>
+            {profile.wallet?.name
+              ? profile.wallet.name.name
+              : truncateAddress(profile.wallet?.address || '')}
+          </Heading>
+          {profile.wallet?.name && (
+            <img
+              src="https://www.stargaze.zone/favicon.ico"
+              className="w-5 h-5"
             />
-          </a>
+          )}
         </div>
       </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <Divider className="mt-8" />
+      <div className="grid grid-cols-4">
+        <div className="pr-8 pt-4 min-h-52 border-r border-zinc-950/10 dark:border-white/10">
+          <Heading level={2}>Collections</Heading>
+          {isLoadingAllTokens ? (
+            <div className="flex col-span-2 justify-center items-center w-full h-full">
+              <Spinner />
+            </div>
+          ) : (
+            <div className="flex flex-col py-2 !space-y-1">
+              {collections.map((collection) => (
+                <button
+                  onClick={() => toggleCollection(collection.contractAddress)}
+                  key={collection.contractAddress}
+                  className={clsx(
+                    selectedCollections.has(collection.contractAddress)
+                      ? '!bg-zinc-950/25 dark:!bg-white/25'
+                      : 'hover:!bg-zinc-950/10 dark:hover:!bg-white/10',
+                    'flex items-center !cursor-pointer gap-4 p-3 rounded-md'
+                  )}
+                >
+                  <img
+                    src={collection.media?.visualAssets?.lg?.staticUrl || ''}
+                    alt={collection.name || ''}
+                    className="w-12 h-12 aspect-square rounded-md"
+                  />
+                  <div className="flex flex-col">
+                    <Text className="font-medium text-left !text-black dark:!text-white">
+                      {collection.name}
+                    </Text>
+                    <Text className="text-black/50 dark:text-white/50 text-left">
+                      {formatCurrency(collection.floorPrice, 'STARS')}
+                    </Text>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        {isLoadingFilteredTokens ? (
+          <div className="flex col-span-2 justify-center items-center w-full h-full">
+            <Spinner />
+          </div>
+        ) : (
+          <div className="flex flex-col col-span-2 space-y-2 border-r border-zinc-950/10 dark:border-white/10">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeader className="text-black dark:text-white !pl-4">
+                    {filteredTokens?.tokens?.tokens.length}{' '}
+                    {(filteredTokens?.tokens?.tokens.length || 0) > 1
+                      ? 'Tokens'
+                      : 'Token'}
+                  </TableHeader>
+                  <TableHeader>Collection</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredTokens?.tokens?.tokens.map((token) => (
+                  <NFT
+                    key={`${token.collection.contractAddress}-${token.tokenId}`}
+                    token={token}
+                    onClick={() =>
+                      toggleToken(
+                        token.collection.contractAddress,
+                        token.tokenId,
+                        token.media?.visualAssets?.lg?.staticUrl || ''
+                      )
+                    }
+                    selected={selectedTokens.has(
+                      mod(token.collection.contractAddress, token.tokenId)
+                    )}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+            <Pagination className="mt-6 pb-3 px-3">
+              <PaginationPrevious
+                disabled={tokenPage <= 1}
+                onClick={() => setTokenPage(tokenPage - 1)}
+              />
+              <PaginationList>
+                {tokenPage > 1 && (
+                  <PaginationPage onClick={() => setTokenPage(tokenPage - 1)}>
+                    {tokenPage - 1}
+                  </PaginationPage>
+                )}
+                <PaginationPage current>{tokenPage}</PaginationPage>
+                {(filteredTokens?.tokens?.pageInfo?.total || 0) >
+                  tokenPage * 7 && (
+                  <PaginationPage onClick={() => setTokenPage(tokenPage + 1)}>
+                    {tokenPage + 1}
+                  </PaginationPage>
+                )}
+              </PaginationList>
+              <PaginationNext
+                disabled={
+                  (filteredTokens?.tokens?.pageInfo?.total || 0) < tokenPage * 7
+                }
+                onClick={() => setTokenPage(tokenPage + 1)}
+              />
+            </Pagination>
+          </div>
+        )}
+        <div className="pl-4 pt-4">
+          <Heading level={2}>Selected</Heading>
+          <div className="grid grid-cols-2 gap-4 grid-flow-row mt-4">
+            {Array.from(selectedTokens.entries()).map(([tokenMod, image]) => {
+              const { collectionAddress, tokenId } = demod(tokenMod)
+              return (
+                <button
+                  onClick={() => toggleToken(collectionAddress, tokenId, image)}
+                  className="transform hover:scale-110 duration-150 ease-in-out transition"
+                >
+                  <img
+                    src={image}
+                    alt={tokenMod}
+                    className="w-full h-full aspect-square rounded-md"
+                  />
+                </button>
+              )
+            })}
+          </div>
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <Divider />
+      <div className="flex flex-row justify-between mt-4">
+        <div></div>
+        <Button color="dark/white" className="cursor-pointer">
+          Create Trade
+        </Button>
       </div>
     </main>
-  );
+  ) : (
+    <div className="border-zinc-950/10 dark:border-white/10 border rounded-md p-4 lg:py-4 lg:px-8 flex space-y-4 lg:space-y-0 flex-col lg:flex-row justify-between items-center">
+      <div>
+        <Heading>Connect a wallet to get started</Heading>
+        <Text>Pegasus requires a connected wallet to trade NFTs.</Text>
+      </div>
+      <>
+        <Button
+          color="white"
+          className="!cursor-pointer !w-full lg:!w-auto"
+          onClick={() => setIsWalletModalOpen(true)}
+        >
+          Connect wallet
+        </Button>
+        <WalletModal
+          isOpen={isWalletModalOpen}
+          setIsOpen={setIsWalletModalOpen}
+          callback={(walletType) => {
+            connect({ chainId: CHAIN_ID, walletType })
+            setIsWalletModalOpen(false)
+          }}
+        />
+      </>
+    </div>
+  )
 }

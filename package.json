@@ -2,23 +2,58 @@
   "name": "trade",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "install": "graz generate -g",
+    "graphql": "graphql-codegen-esm --config codegen.ts"
   },
   "dependencies": {
+    "@apollo/client": "^3.11.1",
+    "@cosmjs/cosmwasm-stargate": "^0.32.4",
+    "@cosmjs/launchpad": "^0.27.1",
+    "@cosmjs/proto-signing": "^0.32.4",
+    "@cosmjs/stargate": "^0.32.4",
+    "@cosmjs/tendermint-rpc": "^0.32.4",
+    "@headlessui/react": "^2.1.2",
+    "@heroicons/react": "^2.1.5",
+    "@leapwallet/cosmos-social-login-capsule-provider": "^0.0.39",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.3.17",
+    "graphql": "^16.9.0",
+    "graz": "^0.1.19",
+    "is-mobile": "^4.0.0",
+    "long": "^5.2.3",
+    "next": "14.2.5",
+    "pino-pretty": "^11.2.2",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.5"
+    "string-width": "4.2.3"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/client-preset": "^4.3.3",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.0",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "node-fetch": "2.6.1",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "prettier": "^3.3.3",
+    "prettier-plugin-organize-imports": "^4.0.0",
+    "strip-ansi": "^7.1.0",
+    "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  },
+  "resolutions": {
+    "cli-truncate": "^4.0.0",
+    "wrap-ansi": "^9.0.0",
+    "listr2": "^8.2.3",
+    "inquirer": "^10.1.0"
   }
 }
