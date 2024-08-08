@@ -97,6 +97,8 @@ export default function NotificationDropdown() {
     if (!account) throw new Error('Cannot register without an account')
     if (!registration) throw new Error('Failed to retrieve registration')
 
+    setIsLoading(true)
+
     const signature = await handleRetrieveSignature()
     if (!signature) throw new Error('Failed to retrieve signature')
 
@@ -181,6 +183,7 @@ export default function NotificationDropdown() {
       throw new Error('Failed to subscribe')
     }
 
+    setIsLoading(false)
     refresh()
   }, [registration, account])
 
