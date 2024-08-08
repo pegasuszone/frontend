@@ -176,7 +176,7 @@ export default function NotificationDropdown() {
   const handleRetrieveSubscription: () => Promise<
     PushSubscriptionJSON | undefined
   > = useCallback(async () => {
-    if (!account) throw new Error('Cannot register without an account')
+    if (!account) return
 
     const signature = await handleRetrieveSignature()
     if (!signature) throw new Error('Failed to retrieve signature')
@@ -210,7 +210,7 @@ export default function NotificationDropdown() {
       setIsLoading(false)
     }
     effect()
-  }, [])
+  }, [account])
 
   return (
     <DropdownMenu>

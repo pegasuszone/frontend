@@ -14,7 +14,7 @@ import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { Workbox } from 'workbox-window'
 
-export const queryClient = new QueryClient()
+const queryClient = new QueryClient()
 
 const metadata = {
   title: 'Pegasus',
