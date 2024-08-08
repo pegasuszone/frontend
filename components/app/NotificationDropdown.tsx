@@ -27,34 +27,43 @@ export default function NotificationDropdown() {
   const [refreshCounter, setRefreshCounter] = useState(0)
   const refresh = () => setRefreshCounter(refreshCounter + 1)
 
-  const handleRetrieveSignature: () => Promise<StdTx> =
-    useCallback(async () => {
-      if (!account)
-        throw new Error('Cannot retrieve signature without a connected account')
-      const signatureItem = localStorage.getItem(
-        `swift:signature/${account.bech32Address}`
-      )
+  const handleRetrieveSignature: (sign?: boolean) => Promise<StdTx> =
+    useCallback(
+      async (sign = true) => {
+        if (!account)
+          throw new Error(
+            'Cannot retrieve signature without a connected account'
+          )
+        const signatureItem = localStorage.getItem(
+          `swift:signature/${account.bech32Address}`
+        )
 
-      if (signatureItem) {
-        const sig = JSON.parse(signatureItem) as StdTx
-        if (
-          sig.msg[0].type !== 'sign/MsgSignData' &&
-          sig.msg[0].value.signer !== account?.bech32Address
-        ) {
-          localStorage.removeItem('swift:signature')
-        } else {
-          return sig
+        if (signatureItem) {
+          const sig = JSON.parse(signatureItem) as StdTx
+          if (
+            sig.msg[0].type !== 'sign/MsgSignData' &&
+            sig.msg[0].value.signer !== account?.bech32Address
+          ) {
+            localStorage.removeItem('swift:signature')
+          } else {
+            return sig
+          }
         }
-      }
 
-      const sig = await handleSign()
-      if (!sig) throw new Error('Failed to sign message')
-      localStorage.setItem(
-        `swift:signature/${account.bech32Address}`,
-        JSON.stringify(sig)
-      )
-      return sig
-    }, [localStorage, account])
+        if (sign) {
+          const sig = await handleSign()
+          if (!sig) throw new Error('Failed to sign message')
+          localStorage.setItem(
+            `swift:signature/${account.bech32Address}`,
+            JSON.stringify(sig)
+          )
+          return sig
+        } else {
+          throw new Error('NoSign set: no signature retrieved')
+        }
+      },
+      [localStorage, account]
+    )
 
   const handleSign = useCallback(async () => {
     console.log(account)
@@ -73,20 +82,15 @@ export default function NotificationDropdown() {
           type: 'sign/MsgSignData',
           value: {
             signer: account.bech32Address,
-            data: authMsg,
+            data: btoa(authMsg),
           },
         },
       ],
       {
         gas: '0',
-        amount: [
-          {
-            denom: 'ustars',
-            amount: '0',
-          },
-        ],
+        amount: [],
       },
-      CHAIN_ID,
+      '',
       '',
       0,
       0
@@ -208,38 +212,45 @@ export default function NotificationDropdown() {
     refresh()
   }, [registration, account])
 
-  const handleRetrieveSubscription: () => Promise<
-    PushSubscriptionJSON | undefined
-  > = useCallback(async () => {
-    if (!account) return
+  const handleRetrieveSubscription: (
+    sign?: boolean
+  ) => Promise<PushSubscriptionJSON | undefined> = useCallback(
+    async (sign = true) => {
+      if (!account) return
 
-    const signature = await handleRetrieveSignature()
-    if (!signature) throw new Error('Failed to retrieve signature')
+      const signature = await handleRetrieveSignature(sign)
+      if (!signature) throw new Error('Failed to retrieve signature')
 
-    const subscriptionResponse = await fetch(`${SWIFT_API}/notify/verify`, {
-      method: 'POST',
-      body: JSON.stringify({
-        signature,
-        app: SWIFT_APP_ID,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+      const subscriptionResponse = await fetch(`${SWIFT_API}/notify/verify`, {
+        method: 'POST',
+        body: JSON.stringify({
+          signature,
+          app: SWIFT_APP_ID,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
 
-    if (subscriptionResponse.status !== 200) {
-      return undefined
-    }
+      if (subscriptionResponse.status !== 200) {
+        return undefined
+      }
 
-    const sub: VerifyResponseType = await subscriptionResponse.json()
-    return sub.subscription
-  }, [account])
+      const sub: VerifyResponseType = await subscriptionResponse.json()
+      return sub.subscription
+    },
+    [account]
+  )
 
   useEffect(() => {
     async function effect() {
-      const subscription = await handleRetrieveSubscription()
-      setSubscription(subscription)
-      setIsLoading(false)
+      try {
+        const subscription = await handleRetrieveSubscription(false)
+        setSubscription(subscription)
+        setIsLoading(false)
+      } catch {
+        setIsLoading(false)
+      }
     }
     effect()
   }, [account, refreshCounter])
