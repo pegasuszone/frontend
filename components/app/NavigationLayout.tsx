@@ -34,6 +34,7 @@ import { stargaze, stargazetestnet } from 'graz/chains'
 import isMobile from 'is-mobile'
 import { usePathname } from 'next/navigation'
 import { Button } from '../catalyst/button'
+import NotificationDropdown from './NotificationDropdown'
 import WalletModal from './WalletModal'
 
 const navItems = [
@@ -87,9 +88,15 @@ export default function NavigationLayout({
               </Badge>
             )}
             <Dropdown>
-              <DropdownButton as={NavbarItem} aria-label="Notifications">
-                <BellIcon />
+              <DropdownButton
+                disabled={!isConnected}
+                as={NavbarItem}
+                className="!cursor-pointer"
+                aria-label="Notifications"
+              >
+                <BellIcon className="!cursor-pointer" />
               </DropdownButton>
+              <NotificationDropdown />
             </Dropdown>
             {isConnected ? (
               <Button

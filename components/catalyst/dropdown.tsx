@@ -41,8 +41,6 @@ export function DropdownMenu({
         'bg-white/75 backdrop-blur-xl dark:bg-zinc-800/75',
         // Shadows
         'shadow-lg ring-1 ring-zinc-950/10 dark:ring-inset dark:ring-white/10',
-        // Define grid at the menu level if subgrid is supported
-        'supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[auto_1fr_1.5rem_0.5rem_auto]',
         // Transitions
         'transition data-[closed]:data-[leave]:opacity-0 data-[leave]:duration-100 data-[leave]:ease-in'
       )}
@@ -89,8 +87,16 @@ export function DropdownItem({
   )
 }
 
-export function DropdownHeader({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
-  return <div {...props} className={clsx(className, 'col-span-5 px-3.5 pb-1 pt-2.5 sm:px-3')} />
+export function DropdownHeader({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'>) {
+  return (
+    <div
+      {...props}
+      className={clsx(className, 'col-span-5 px-3.5 pb-1 pt-2.5 sm:px-3')}
+    />
+  )
 }
 
 export function DropdownSection({
@@ -144,7 +150,12 @@ export function DropdownLabel({
   ...props
 }: { className?: string } & Omit<Headless.LabelProps, 'className'>) {
   return (
-    <Headless.Label {...props} data-slot="label" className={clsx(className, 'col-start-2 row-start-1')} {...props} />
+    <Headless.Label
+      {...props}
+      data-slot="label"
+      className={clsx(className, 'col-start-2 row-start-1')}
+      {...props}
+    />
   )
 }
 
@@ -168,12 +179,18 @@ export function DropdownShortcut({
   keys,
   className,
   ...props
-}: { keys: string | string[]; className?: string } & Omit<Headless.DescriptionProps<'kbd'>, 'className'>) {
+}: { keys: string | string[]; className?: string } & Omit<
+  Headless.DescriptionProps<'kbd'>,
+  'className'
+>) {
   return (
     <Headless.Description
       as="kbd"
       {...props}
-      className={clsx(className, 'col-start-5 row-start-1 flex justify-self-end')}
+      className={clsx(
+        className,
+        'col-start-5 row-start-1 flex justify-self-end'
+      )}
     >
       {(Array.isArray(keys) ? keys : keys.split('')).map((char, index) => (
         <kbd

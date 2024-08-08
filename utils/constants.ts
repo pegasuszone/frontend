@@ -25,6 +25,12 @@ export const BLOCK_EXPLORER = process.env.NEXT_PUBLIC_TESTNET_ENABLED
   ? process.env.NEXT_PUBLIC_TESTNET_BLOCK_EXPLORER
   : process.env.NEXT_PUBLIC_MAINNET_BLOCK_EXPLORER
 
+export const SWIFT_API = process.env.NEXT_PUBLIC_TESTNET_ENABLED
+  ? process.env.NEXT_PUBLIC_TESTNET_SWIFT_API!
+  : process.env.NEXT_PUBLIC_MAINNET_SWIFT_API!
+
+export const SWIFT_APP_ID = parseInt(process.env.NEXT_PUBLIC_SWIFT_APP_ID!)
+
 export const SUPPORTED_WALLETS: {
   type: WalletType
   name: string
