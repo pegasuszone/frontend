@@ -157,8 +157,8 @@ export default function Home() {
     <main className="w-screen !mx-0 !max-w-full">
       <Profile profile={profile} />
       <Divider className="mt-8" />
-      <div className="grid grid-cols-4">
-        <div className="pr-8 pt-4 min-h-52 border-r border-zinc-950/10 dark:border-white/10">
+      <div className="grid grid-cols-1 lg:grid-cols-4">
+        <div className="pr-8 pt-4 min-h-52 lg:border-r border-zinc-950/10 dark:border-white/10">
           <Heading level={2}>Collections</Heading>
           {isLoadingAllTokens ? (
             <div className="flex col-span-2 justify-center items-center w-full h-full">
@@ -200,7 +200,7 @@ export default function Home() {
             <Spinner />
           </div>
         ) : (
-          <div className="flex flex-col col-span-2 space-y-2 border-r border-zinc-950/10 dark:border-white/10">
+          <div className="flex flex-col col-span-2 space-y-2 border-t lg:border-r border-zinc-950/10 dark:border-white/10">
             <Table>
               <TableHead>
                 <TableRow>
@@ -232,7 +232,7 @@ export default function Home() {
                 ))}
               </TableBody>
             </Table>
-            <Pagination className="mt-6 pb-3 px-3">
+            <Pagination className="mt-6 pb-3 pr-3 lg:px-3">
               <PaginationPrevious
                 disabled={tokenPage <= 1}
                 onClick={() => setTokenPage(tokenPage - 1)}
@@ -260,7 +260,7 @@ export default function Home() {
             </Pagination>
           </div>
         )}
-        <div className="pl-4 pt-4">
+        <div className="lg:pl-4 py-4">
           <Heading level={2}>Selected</Heading>
           <div className="grid grid-cols-2 gap-4 grid-flow-row mt-4">
             {Array.from(selectedTokens.entries()).map(([tokenMod, image]) => {
@@ -288,7 +288,7 @@ export default function Home() {
         <Button
           onClick={() => router.push('/trade')}
           color="dark/white"
-          className="cursor-pointer"
+          className="cursor-pointer w-full lg:w-auto"
         >
           Create Trade
         </Button>

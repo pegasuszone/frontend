@@ -119,68 +119,72 @@ export default function Outbox() {
             return (
               <div
                 key={offer.id}
-                className="p-4 border border-zinc-950/10 dark:border-white/10 rounded-lg"
+                className="p-4 flex flex-col justify-between border border-zinc-950/10 dark:border-white/10 rounded-lg"
               >
-                <div className="flex flex-row items-center space-x-2">
-                  <PaperAirplaneIcon className="text-black dark:text-white w-5 h-5" />
-                  <Heading level={3}>{truncateAddress(offer.peer)}</Heading>
-                </div>
-                <Divider className="my-4" />
-                <ReactTooltip
-                  effect="solid"
-                  type="info"
-                  className="tooltip"
-                  arrowColor="rgba(0,0,0,0)"
-                />
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div>
-                    <Heading level={4} className="mb-2">
-                      Yours
-                    </Heading>
-                    <div className="grid grid-flow-row grid-cols-3 gap-2">
-                      {offer.offered_nfts.map((nft) => (
-                        <NFTImage
-                          key={mod(nft.collection, nft.token_id.toString())}
-                          collectionAddress={nft.collection}
-                          tokenId={nft.token_id.toString()}
-                        />
-                      ))}
+                <div>
+                  <div className="flex flex-row items-center space-x-2">
+                    <PaperAirplaneIcon className="text-black dark:text-white w-5 h-5" />
+                    <Heading level={3}>{truncateAddress(offer.peer)}</Heading>
+                  </div>
+                  <Divider className="my-4" />
+                  <ReactTooltip
+                    effect="solid"
+                    type="info"
+                    className="tooltip"
+                    arrowColor="rgba(0,0,0,0)"
+                  />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                      <Heading level={4} className="mb-2">
+                        Yours
+                      </Heading>
+                      <div className="grid grid-flow-row grid-cols-3 gap-2">
+                        {offer.offered_nfts.map((nft) => (
+                          <NFTImage
+                            key={mod(nft.collection, nft.token_id.toString())}
+                            collectionAddress={nft.collection}
+                            tokenId={nft.token_id.toString()}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <Heading level={4} className="mb-2">
+                        Theirs
+                      </Heading>
+                      <div className="grid grid-flow-row grid-cols-3 gap-2">
+                        {offer.wanted_nfts.map((nft) => (
+                          <NFTImage
+                            key={mod(nft.collection, nft.token_id.toString())}
+                            collectionAddress={nft.collection}
+                            tokenId={nft.token_id.toString()}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <Heading level={4} className="mb-2">
-                      Theirs
-                    </Heading>
-                    <div className="grid grid-flow-row grid-cols-3 gap-2">
-                      {offer.wanted_nfts.map((nft) => (
-                        <NFTImage
-                          key={mod(nft.collection, nft.token_id.toString())}
-                          collectionAddress={nft.collection}
-                          tokenId={nft.token_id.toString()}
-                        />
-                      ))}
-                    </div>
-                  </div>
                 </div>
-                <Divider className="my-4" />
-                <div className="flex flex-col lg:flex-row lg:justify-between items-center">
-                  <p
-                    className={clsx(
-                      expired
-                        ? 'text-red-500'
-                        : 'text-zinc-950 dark:text-white/80',
-                      'text-sm'
-                    )}
-                  >
-                    {expired ? 'Expired' : 'Expires'}{' '}
-                    {expiresAt.toLocaleString()}
-                  </p>
-                  <Button
-                    className="cursor-pointer mt-2 lg:mt-0 w-full lg:w-auto"
-                    onClick={() => handleRetractOffer(offer)}
-                  >
-                    Retract Offer
-                  </Button>
+                <div>
+                  <Divider className="my-4" />
+                  <div className="flex flex-col lg:flex-row lg:justify-between items-center">
+                    <p
+                      className={clsx(
+                        expired
+                          ? 'text-red-500'
+                          : 'text-zinc-950 dark:text-white/80',
+                        'text-sm'
+                      )}
+                    >
+                      {expired ? 'Expired' : 'Expires'}{' '}
+                      {expiresAt.toLocaleString()}
+                    </p>
+                    <Button
+                      className="cursor-pointer mt-2 lg:mt-0 w-full lg:w-auto"
+                      onClick={() => handleRetractOffer(offer)}
+                    >
+                      Retract Offer
+                    </Button>
+                  </div>
                 </div>
               </div>
             )

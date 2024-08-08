@@ -206,7 +206,7 @@ export default function Trade() {
 
   return isConnected && !!profile ? (
     <main className="w-screen !mx-0 !max-w-full">
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:justify-between">
         <div className="flex flex-col space-y-2">
           <Profile profile={profile} />
 
@@ -233,7 +233,7 @@ export default function Trade() {
           className="tooltip"
           arrowColor="rgba(0,0,0,0)"
         />
-        <div className="grid grid-rows-1 grid-flow-col gap-4">
+        <div className="grid grid-cols-5 lg:grid-rows-1 lg:grid-flow-col gap-4">
           {Array.from(selectedUserTokens.entries()).map(([tokenMod, image]) => {
             const { tokenId } = demod(tokenMod)
             return (
@@ -242,7 +242,7 @@ export default function Trade() {
                   src={image}
                   alt={tokenMod}
                   data-tip={`#${tokenId}`}
-                  className="h-16 w-16 aspect-square rounded-md"
+                  className="h-14 lg:h-16 w-14 lg:w-16 aspect-square rounded-md"
                 />
               </div>
             )
@@ -252,8 +252,8 @@ export default function Trade() {
       <Divider className="mt-8" />
       {peer ? (
         <div>
-          <div className="grid grid-cols-4">
-            <div className="pr-8 pt-4 min-h-52 border-r border-zinc-950/10 dark:border-white/10">
+          <div className="grid grid-cols-1 lg:grid-cols-4">
+            <div className="pr-8 pt-4 min-h-52 lg:border-r border-zinc-950/10 dark:border-white/10">
               <Heading level={2}>Collections</Heading>
               {isLoadingAllTokens ? (
                 <div className="flex col-span-2 justify-center items-center w-full h-full">
@@ -299,7 +299,7 @@ export default function Trade() {
                 <Spinner />
               </div>
             ) : (
-              <div className="flex flex-col col-span-2 space-y-2 border-r border-zinc-950/10 dark:border-white/10">
+              <div className="flex flex-col col-span-2 space-y-2 border-t lg:border-r border-zinc-950/10 dark:border-white/10">
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -367,7 +367,7 @@ export default function Trade() {
                 </Pagination>
               </div>
             )}
-            <div className="pl-4 pt-4">
+            <div className="lg:pl-4 py-4">
               <Heading level={2}>Selected</Heading>
               <div className="grid grid-cols-2 gap-4 grid-flow-row mt-4">
                 {Array.from(selectedTokens.entries()).map(
@@ -405,7 +405,7 @@ export default function Trade() {
                   await confirmTrade()
                 }}
                 color="dark/white"
-                className="cursor-pointer"
+                className="cursor-pointer w-full lg:w-auto"
               >
                 Send Offer
               </Button>
