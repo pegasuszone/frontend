@@ -32,7 +32,7 @@ function ProgressierObj() {
         }
         this.appId = 'd1YRu9dGZ3sSjIKB6Xrk'
         t.appId = 'd1YRu9dGZ3sSjIKB6Xrk'
-        
+
         this.helpArticle = function(e) {
             return "https://intercom.help/progressier/en/articles/" + e
         };
@@ -47,10 +47,8 @@ function ProgressierObj() {
                 return e()
             }, 100)
         });
-        this.fetchdomain = new URL(t.script).origin;
-        if (t.fetchdomain.includes("progressier.app")) {
-            t.fetchdomain = "https://progressier.com"
-        }
+        this.fetchdomain = "https://progressier.com";
+        t.fetchdomain = "https://progressier.com";
         this.cookies = new ProgressierCookies;
         this.wording = new ProgressierText(t);
         this.utils = new ProgressierUtils(t);
