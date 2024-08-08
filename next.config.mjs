@@ -10,9 +10,6 @@ const nextConfig = {
       allowedForwardedHosts: ["localhost:3000", "*.swiftprotocol.zone"],
     }
   },
-  compiler: {
-    removeConsole: process.env.NODE_ENV !== "development",
-  },
 };
 
 const withPWA = pwa({
