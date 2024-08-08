@@ -72,7 +72,6 @@ export default function NotificationDropdown() {
 
     const wallet = getWallet()
     console.log(wallet)
-    if (!wallet.signAmino) throw new Error('Wallet does not support Amino')
 
     const authMsg =
       'I am signing this message to authorize Pegasus to display push notifications on this device.'
@@ -106,7 +105,9 @@ export default function NotificationDropdown() {
 
     console.log(CHAIN_ID, account.bech32Address, signDoc)
 
-    const sig = await wallet.signAmino(CHAIN_ID, account.bech32Address, signDoc)
+    const offlineSigner = wallet.getOfflineSignerOnlyAmino(CHAIN_ID)
+    console.log(offlineSigner)
+    const sig = await offlineSigner.signAmino(account.bech32Address, signDoc)
 
     console.log(sig)
 
