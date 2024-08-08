@@ -1,17 +1,15 @@
 import { WalletType } from 'graz'
+import { stargaze, stargazetestnet } from 'graz/chains'
 
 export const microAmountMultiplier = 1_000_000
-
-// export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TRADE_CONTRACT_ADDRESS!
-// export const CONTRACT_CODEID = parseInt(
-//   process.env.NEXT_PUBLIC_TRADE_CONTRACT_CODEID!
-// )
-
-// export const SG721_CODEID = parseInt(process.env.NEXT_PUBLIC_SG721_CODEID!)
 
 export const GRAPHQL = process.env.NEXT_PUBLIC_TESTNET_ENABLED
   ? process.env.NEXT_PUBLIC_TESTNET_GRAPHQL!
   : process.env.NEXT_PUBLIC_MAINNET_GRAPHQL!
+
+export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TESTNET_ENABLED
+  ? process.env.NEXT_PUBLIC_TESTNET_CONTRACT_ADDRESS!
+  : process.env.NEXT_PUBLIC_MAINNET_CONTRACT_ADDRESS!
 
 export const CHAIN_ID = process.env.NEXT_PUBLIC_TESTNET_ENABLED
   ? 'elgafar-1'
@@ -19,6 +17,13 @@ export const CHAIN_ID = process.env.NEXT_PUBLIC_TESTNET_ENABLED
 export const CHAIN_NAME = process.env.NEXT_PUBLIC_TESTNET_ENABLED
   ? 'stargazetestnet'
   : 'stargaze'
+export const CHAIN_DATA = process.env.NEXT_PUBLIC_TESTNET_ENABLED
+  ? stargazetestnet
+  : stargaze
+
+export const BLOCK_EXPLORER = process.env.NEXT_PUBLIC_TESTNET_ENABLED
+  ? process.env.NEXT_PUBLIC_TESTNET_BLOCK_EXPLORER
+  : process.env.NEXT_PUBLIC_MAINNET_BLOCK_EXPLORER
 
 export const SUPPORTED_WALLETS: {
   type: WalletType

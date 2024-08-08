@@ -24,15 +24,22 @@ import {
 import { StackedLayout } from '@/components/catalyst/stacked-layout'
 import { CHAIN_ID } from '@/utils/constants'
 import { BellIcon, ChevronRightIcon } from '@heroicons/react/16/solid'
-import { useAccount, useConnect, useDisconnect } from 'graz'
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useSuggestChainAndConnect,
+} from 'graz'
+import { stargaze, stargazetestnet } from 'graz/chains'
+import isMobile from 'is-mobile'
 import { usePathname } from 'next/navigation'
 import { Button } from '../catalyst/button'
 import WalletModal from './WalletModal'
 
 const navItems = [
   { label: 'Trade', url: '/' },
-  { label: 'Inbox', url: '/inbox' },
-  { label: 'Outbox', url: '/outbox' },
+  { label: 'Inbox', url: '/inbox', walletRequired: true },
+  { label: 'Outbox', url: '/outbox', walletRequired: true },
 ]
 
 export default function NavigationLayout({
@@ -41,6 +48,7 @@ export default function NavigationLayout({
   children: ReactNode
 }) {
   const pathname = usePathname()
+  const { suggestAndConnect } = useSuggestChainAndConnect()
   const { connect } = useConnect()
   const { disconnect } = useDisconnect()
   const { isConnected } = useAccount()
@@ -58,8 +66,15 @@ export default function NavigationLayout({
           </Dropdown>
           <NavbarDivider className="max-lg:hidden" />
           <NavbarSection className="max-lg:hidden">
-            {navItems.map(({ label, url }) => (
-              <NavbarItem key={label} href={url} current={pathname === url}>
+            {navItems.map(({ label, url, walletRequired }) => (
+              <NavbarItem
+                key={label}
+                href={url}
+                current={pathname === url}
+                onClick={() => {
+                  if (walletRequired && !isConnected) setIsWalletModalOpen(true)
+                }}
+              >
                 {label}
               </NavbarItem>
             ))}
@@ -82,7 +97,7 @@ export default function NavigationLayout({
                 className="!cursor-pointer"
                 onClick={() => disconnect()}
               >
-                Disconnect wallet
+                {isMobile() ? 'Disconnect' : 'Disconnect wallet'}
               </Button>
             ) : (
               <>
@@ -91,13 +106,23 @@ export default function NavigationLayout({
                   className="!cursor-pointer"
                   onClick={() => setIsWalletModalOpen(true)}
                 >
-                  Connect wallet
+                  {isMobile() ? 'Connect' : 'Connect wallet'}
                 </Button>
                 <WalletModal
                   isOpen={isWalletModalOpen}
                   setIsOpen={setIsWalletModalOpen}
                   callback={(walletType) => {
-                    connect({ chainId: CHAIN_ID, walletType })
+                    if (isMobile()) {
+                      connect({ chainId: CHAIN_ID, walletType })
+                    } else {
+                      suggestAndConnect({
+                        chainInfo:
+                          CHAIN_ID === 'stargaze-1'
+                            ? stargaze
+                            : stargazetestnet,
+                        walletType,
+                      })
+                    }
                     setIsWalletModalOpen(false)
                   }}
                 />
@@ -118,8 +143,15 @@ export default function NavigationLayout({
           </SidebarHeader>
           <SidebarBody>
             <SidebarSection>
-              {navItems.map(({ label, url }) => (
-                <SidebarItem key={label} href={url}>
+              {navItems.map(({ label, url, walletRequired }) => (
+                <SidebarItem
+                  key={label}
+                  href={url}
+                  onClick={() => {
+                    if (walletRequired && !isConnected)
+                      setIsWalletModalOpen(true)
+                  }}
+                >
                   {label}
                 </SidebarItem>
               ))}

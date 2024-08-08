@@ -2,6 +2,7 @@
 
 import { Collection } from '@/__generated__/graphql'
 import NFT from '@/components/app/NFT'
+import Profile from '@/components/app/Profile'
 import Spinner from '@/components/app/Spinner'
 import WalletModal from '@/components/app/WalletModal'
 import { Button } from '@/components/catalyst/button'
@@ -26,23 +27,23 @@ import { useTrade } from '@/contexts/trade'
 import GET_OWNED_TOKENS from '@/graphql/owned-tokens'
 import GET_PROFILE from '@/graphql/profile'
 import { CHAIN_ID } from '@/utils/constants'
-import { demod, formatCurrency, mod, truncateAddress } from '@/utils/format'
+import { demod, formatCurrency, mod } from '@/utils/format'
 import { useQuery } from '@apollo/client'
-import { UserIcon } from '@heroicons/react/20/solid'
 import clsx from 'clsx'
-import { useAccount, useConnect } from 'graz'
+import { useAccount, useConnect, useSuggestChainAndConnect } from 'graz'
+import { stargaze, stargazetestnet } from 'graz/chains'
+import isMobile from 'is-mobile'
+import { useRouter } from 'next/navigation'
 import { useCallback, useMemo, useState } from 'react'
 
 export default function Home() {
   const { data: account, isConnected } = useAccount()
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false)
   const { connect } = useConnect()
+  const router = useRouter()
+  const { suggestAndConnect } = useSuggestChainAndConnect()
 
-  const {
-    loading: isLoadingProfile,
-    error,
-    data: profile,
-  } = useQuery(GET_PROFILE, {
+  const { data: profile } = useQuery(GET_PROFILE, {
     variables: { address: account?.bech32Address || '' },
   })
 
@@ -154,32 +155,7 @@ export default function Home() {
 
   return isConnected && !!profile ? (
     <main className="w-screen !mx-0 !max-w-full">
-      <div className="flex flex-row space-x-6 items-center">
-        {profile.wallet?.name ? (
-          <img
-            src={profile.wallet?.name?.media?.visualAssets?.lg?.url as string}
-            alt={profile?.wallet?.name?.name}
-            className="w-16 h-16 rounded-md"
-          />
-        ) : (
-          <div className="bg-zinc-950/10 dark:bg-white/10 flex items-center justify-center w-16 h-16 rounded-md">
-            <UserIcon className="text-zinc-950/50 dark:text-white/50 w-6 h-6" />
-          </div>
-        )}
-        <div className="flex flex-row space-x-3 items-center">
-          <Heading>
-            {profile.wallet?.name
-              ? profile.wallet.name.name
-              : truncateAddress(profile.wallet?.address || '')}
-          </Heading>
-          {profile.wallet?.name && (
-            <img
-              src="https://www.stargaze.zone/favicon.ico"
-              className="w-5 h-5"
-            />
-          )}
-        </div>
-      </div>
+      <Profile profile={profile} />
       <Divider className="mt-8" />
       <div className="grid grid-cols-4">
         <div className="pr-8 pt-4 min-h-52 border-r border-zinc-950/10 dark:border-white/10">
@@ -292,6 +268,7 @@ export default function Home() {
               return (
                 <button
                   onClick={() => toggleToken(collectionAddress, tokenId, image)}
+                  key={tokenMod}
                   className="transform hover:scale-110 duration-150 ease-in-out transition"
                 >
                   <img
@@ -308,7 +285,11 @@ export default function Home() {
       <Divider />
       <div className="flex flex-row justify-between mt-4">
         <div></div>
-        <Button color="dark/white" className="cursor-pointer">
+        <Button
+          onClick={() => router.push('/trade')}
+          color="dark/white"
+          className="cursor-pointer"
+        >
           Create Trade
         </Button>
       </div>
@@ -331,7 +312,15 @@ export default function Home() {
           isOpen={isWalletModalOpen}
           setIsOpen={setIsWalletModalOpen}
           callback={(walletType) => {
-            connect({ chainId: CHAIN_ID, walletType })
+            if (isMobile()) {
+              connect({ chainId: CHAIN_ID, walletType })
+            } else {
+              suggestAndConnect({
+                chainInfo:
+                  CHAIN_ID === 'stargaze-1' ? stargaze : stargazetestnet,
+                walletType,
+              })
+            }
             setIsWalletModalOpen(false)
           }}
         />

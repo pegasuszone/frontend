@@ -18,24 +18,18 @@ const GET_PROFILE = gql(/* GraphQL */ `
               height
               width
               staticUrl
-              __typename
             }
-            __typename
           }
-          __typename
         }
         records {
           name
           value
           verified
-          __typename
         }
-        __typename
       }
       stats {
         address
       }
-      __typename
     }
   }
 `)

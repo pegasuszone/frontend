@@ -1663,61 +1663,43 @@ export enum WhitelistType {
   Regular = 'REGULAR',
 }
 
+export type NameQueryVariables = Exact<{
+  name: Scalars['String']['input']
+}>
+
+export type NameQuery = {
+  __typename?: 'Query'
+  name?: { __typename?: 'Name'; associatedAddr?: string | null } | null
+}
+
 export type OwnedTokensQueryVariables = Exact<{
   owner?: InputMaybe<Scalars['String']['input']>
-  seller?: InputMaybe<Scalars['String']['input']>
   limit?: InputMaybe<Scalars['Int']['input']>
   offset?: InputMaybe<Scalars['Int']['input']>
   filterByCollectionAddrs?: InputMaybe<
     Array<Scalars['String']['input']> | Scalars['String']['input']
   >
-  filterForSale?: InputMaybe<SaleType>
-  sortBy?: InputMaybe<TokenSort>
 }>
 
 export type OwnedTokensQuery = {
   __typename?: 'Query'
   tokens?: {
-    __typename: 'TokensResult'
+    __typename?: 'TokensResult'
     tokens: Array<{
-      __typename: 'Token'
+      __typename?: 'Token'
       id: string
       tokenId: string
       name?: string | null
-      rarityOrder?: number | null
-      rarityScore?: number | null
-      mintedAt?: any | null
-      saleType?: SaleType | null
-      listedAt?: any | null
-      expiresAtDateTime?: any | null
-      owner?: { __typename: 'WalletAccount'; address: string } | null
-      listPrice?: {
-        __typename: 'CoinAmount'
-        amount?: any | null
-        denom?: string | null
-        symbol?: string | null
-      } | null
-      highestOffer?: {
-        __typename: 'Offer'
-        id: string
-        offerPrice: {
-          __typename: 'CoinAmount'
-          amount?: any | null
-          amountUsd?: number | null
-          denom?: string | null
-          symbol?: string | null
-        }
-      } | null
+      owner?: { __typename?: 'WalletAccount'; address: string } | null
       media?: {
-        __typename: 'Media'
+        __typename?: 'Media'
         type?: MediaType | null
-        url?: string | null
         height?: number | null
         width?: number | null
         visualAssets?: {
-          __typename: 'SizedVisualAssets'
+          __typename?: 'SizedVisualAssets'
           lg?: {
-            __typename: 'VisualAsset'
+            __typename?: 'VisualAsset'
             type?: MediaType | null
             url?: string | null
             height?: number | null
@@ -1727,23 +1709,21 @@ export type OwnedTokensQuery = {
         } | null
       } | null
       collection: {
-        __typename: 'Collection'
+        __typename?: 'Collection'
         contractAddress: string
         contractUri?: string | null
         name?: string | null
-        isExplicit?: boolean | null
         floorPrice?: any | null
         mintStatus?: CollectionMintStatus | null
         media?: {
-          __typename: 'Media'
+          __typename?: 'Media'
           type?: MediaType | null
-          url?: string | null
           height?: number | null
           width?: number | null
           visualAssets?: {
-            __typename: 'SizedVisualAssets'
+            __typename?: 'SizedVisualAssets'
             lg?: {
-              __typename: 'VisualAsset'
+              __typename?: 'VisualAsset'
               type?: MediaType | null
               url?: string | null
               height?: number | null
@@ -1753,14 +1733,14 @@ export type OwnedTokensQuery = {
           } | null
         } | null
         tokenCounts?: {
-          __typename: 'CollectionTokenCounts'
+          __typename?: 'CollectionTokenCounts'
           active?: number | null
           total?: number | null
         } | null
       }
     }>
     pageInfo?: {
-      __typename: 'PageInfo'
+      __typename?: 'PageInfo'
       total?: number | null
       limit?: number | null
       offset?: number | null
@@ -1775,21 +1755,21 @@ export type ProfileWalletQueryVariables = Exact<{
 export type ProfileWalletQuery = {
   __typename?: 'Query'
   wallet?: {
-    __typename: 'WalletAccount'
+    __typename?: 'WalletAccount'
     address: string
     name?: {
-      __typename: 'Name'
+      __typename?: 'Name'
       name: string
       associatedAddr?: string | null
       media?: {
-        __typename: 'Media'
+        __typename?: 'Media'
         type?: MediaType | null
         height?: number | null
         width?: number | null
         visualAssets?: {
-          __typename: 'SizedVisualAssets'
+          __typename?: 'SizedVisualAssets'
           lg?: {
-            __typename: 'VisualAsset'
+            __typename?: 'VisualAsset'
             type?: MediaType | null
             url?: string | null
             height?: number | null
@@ -1799,7 +1779,7 @@ export type ProfileWalletQuery = {
         } | null
       } | null
       records?: Array<{
-        __typename: 'NameRecord'
+        __typename?: 'NameRecord'
         name: string
         value: string
         verified: boolean
@@ -1809,6 +1789,91 @@ export type ProfileWalletQuery = {
   } | null
 }
 
+export type TokenQueryVariables = Exact<{
+  collectionAddr: Scalars['String']['input']
+  tokenId: Scalars['String']['input']
+}>
+
+export type TokenQuery = {
+  __typename?: 'Query'
+  token?: {
+    __typename?: 'Token'
+    id: string
+    tokenId: string
+    name?: string | null
+    owner?: { __typename?: 'WalletAccount'; address: string } | null
+    collection: { __typename?: 'Collection'; name?: string | null }
+    media?: {
+      __typename?: 'Media'
+      type?: MediaType | null
+      height?: number | null
+      width?: number | null
+      visualAssets?: {
+        __typename?: 'SizedVisualAssets'
+        lg?: {
+          __typename?: 'VisualAsset'
+          type?: MediaType | null
+          url?: string | null
+          height?: number | null
+          width?: number | null
+          staticUrl?: string | null
+        } | null
+      } | null
+    } | null
+  } | null
+}
+
+export const NameDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'Name' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'name' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'name' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'name' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'name' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'associatedAddr' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<NameQuery, NameQueryVariables>
 export const OwnedTokensDocument = {
   kind: 'Document',
   definitions: [
@@ -1822,14 +1887,6 @@ export const OwnedTokensDocument = {
           variable: {
             kind: 'Variable',
             name: { kind: 'Name', value: 'owner' },
-          },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'seller' },
           },
           type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
         },
@@ -1866,28 +1923,6 @@ export const OwnedTokensDocument = {
             },
           },
         },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'filterForSale' },
-          },
-          type: {
-            kind: 'NamedType',
-            name: { kind: 'Name', value: 'SaleType' },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'sortBy' },
-          },
-          type: {
-            kind: 'NamedType',
-            name: { kind: 'Name', value: 'TokenSort' },
-          },
-        },
       ],
       selectionSet: {
         kind: 'SelectionSet',
@@ -1902,14 +1937,6 @@ export const OwnedTokensDocument = {
                 value: {
                   kind: 'Variable',
                   name: { kind: 'Name', value: 'owner' },
-                },
-              },
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'sellerAddrOrName' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'seller' },
                 },
               },
               {
@@ -1930,26 +1957,10 @@ export const OwnedTokensDocument = {
               },
               {
                 kind: 'Argument',
-                name: { kind: 'Name', value: 'filterForSale' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'filterForSale' },
-                },
-              },
-              {
-                kind: 'Argument',
                 name: { kind: 'Name', value: 'filterByCollectionAddrs' },
                 value: {
                   kind: 'Variable',
                   name: { kind: 'Name', value: 'filterByCollectionAddrs' },
-                },
-              },
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'sortBy' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'sortBy' },
                 },
               },
             ],
@@ -1970,23 +1981,6 @@ export const OwnedTokensDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'rarityOrder' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'rarityScore' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'mintedAt' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'saleType' },
-                      },
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                      {
-                        kind: 'Field',
                         name: { kind: 'Name', value: 'owner' },
                         selectionSet: {
                           kind: 'SelectionSet',
@@ -1995,95 +1989,8 @@ export const OwnedTokensDocument = {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'address' },
                             },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: '__typename' },
-                            },
                           ],
                         },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'listPrice' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'amount' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'denom' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'symbol' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: '__typename' },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'listedAt' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'expiresAtDateTime' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'highestOffer' },
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'id' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'offerPrice' },
-                              selectionSet: {
-                                kind: 'SelectionSet',
-                                selections: [
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: 'amount' },
-                                  },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: 'amountUsd' },
-                                  },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: 'denom' },
-                                  },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: 'symbol' },
-                                  },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: '__typename' },
-                                  },
-                                ],
-                              },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: '__typename' },
-                            },
-                          ],
-                        },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: '__typename' },
                       },
                       {
                         kind: 'Field',
@@ -2094,10 +2001,6 @@ export const OwnedTokensDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'type' },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: 'url' },
                             },
                             {
                               kind: 'Field',
@@ -2148,26 +2051,11 @@ export const OwnedTokensDocument = {
                                             value: 'staticUrl',
                                           },
                                         },
-                                        {
-                                          kind: 'Field',
-                                          name: {
-                                            kind: 'Name',
-                                            value: '__typename',
-                                          },
-                                        },
                                       ],
                                     },
                                   },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: '__typename' },
-                                  },
                                 ],
                               },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: '__typename' },
                             },
                           ],
                         },
@@ -2192,10 +2080,6 @@ export const OwnedTokensDocument = {
                             },
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'isExplicit' },
-                            },
-                            {
-                              kind: 'Field',
                               name: { kind: 'Name', value: 'floorPrice' },
                             },
                             {
@@ -2207,10 +2091,6 @@ export const OwnedTokensDocument = {
                                   {
                                     kind: 'Field',
                                     name: { kind: 'Name', value: 'type' },
-                                  },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: 'url' },
                                   },
                                   {
                                     kind: 'Field',
@@ -2270,29 +2150,11 @@ export const OwnedTokensDocument = {
                                                   value: 'staticUrl',
                                                 },
                                               },
-                                              {
-                                                kind: 'Field',
-                                                name: {
-                                                  kind: 'Name',
-                                                  value: '__typename',
-                                                },
-                                              },
                                             ],
-                                          },
-                                        },
-                                        {
-                                          kind: 'Field',
-                                          name: {
-                                            kind: 'Name',
-                                            value: '__typename',
                                           },
                                         },
                                       ],
                                     },
-                                  },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: '__typename' },
                                   },
                                 ],
                               },
@@ -2311,10 +2173,6 @@ export const OwnedTokensDocument = {
                                     kind: 'Field',
                                     name: { kind: 'Name', value: 'total' },
                                   },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: '__typename' },
-                                  },
                                 ],
                               },
                             },
@@ -2322,16 +2180,8 @@ export const OwnedTokensDocument = {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'mintStatus' },
                             },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: '__typename' },
-                            },
                           ],
                         },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: '__typename' },
                       },
                     ],
                   },
@@ -2348,14 +2198,9 @@ export const OwnedTokensDocument = {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'offset' },
                       },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: '__typename' },
-                      },
                     ],
                   },
                 },
-                { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
               ],
             },
           },
@@ -2477,26 +2322,11 @@ export const ProfileWalletDocument = {
                                             value: 'staticUrl',
                                           },
                                         },
-                                        {
-                                          kind: 'Field',
-                                          name: {
-                                            kind: 'Name',
-                                            value: '__typename',
-                                          },
-                                        },
                                       ],
                                     },
                                   },
-                                  {
-                                    kind: 'Field',
-                                    name: { kind: 'Name', value: '__typename' },
-                                  },
                                 ],
                               },
-                            },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: '__typename' },
                             },
                           ],
                         },
@@ -2519,16 +2349,8 @@ export const ProfileWalletDocument = {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'verified' },
                             },
-                            {
-                              kind: 'Field',
-                              name: { kind: 'Name', value: '__typename' },
-                            },
                           ],
                         },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: '__typename' },
                       },
                     ],
                   },
@@ -2546,7 +2368,6 @@ export const ProfileWalletDocument = {
                     ],
                   },
                 },
-                { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
               ],
             },
           },
@@ -2555,6 +2376,205 @@ export const ProfileWalletDocument = {
     },
   ],
 } as unknown as DocumentNode<ProfileWalletQuery, ProfileWalletQueryVariables>
+export const TokenDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'Token' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'collectionAddr' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'tokenId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'token' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'collectionAddr' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'collectionAddr' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'tokenId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'tokenId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'tokenId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'owner' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'address' },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'collection' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'media' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'height' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'width' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'visualAssets' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'lg' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'type' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'url' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'height' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'width' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'staticUrl' },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<TokenQuery, TokenQueryVariables>
+
+/**
+ * __useNameQuery__
+ *
+ * To run a query within a React component, call `useNameQuery` and pass it any options that fit your needs.
+ * When your component renders, `useNameQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNameQuery({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useNameQuery(
+  baseOptions: Apollo.QueryHookOptions<NameQuery, NameQueryVariables> &
+    ({ variables: NameQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<NameQuery, NameQueryVariables>(NameDocument, options)
+}
+export function useNameLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<NameQuery, NameQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<NameQuery, NameQueryVariables>(
+    NameDocument,
+    options
+  )
+}
+export function useNameSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<NameQuery, NameQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<NameQuery, NameQueryVariables>(
+    NameDocument,
+    options
+  )
+}
+export type NameQueryHookResult = ReturnType<typeof useNameQuery>
+export type NameLazyQueryHookResult = ReturnType<typeof useNameLazyQuery>
+export type NameSuspenseQueryHookResult = ReturnType<
+  typeof useNameSuspenseQuery
+>
+export type NameQueryResult = Apollo.QueryResult<NameQuery, NameQueryVariables>
 
 /**
  * __useOwnedTokensQuery__
@@ -2569,12 +2589,9 @@ export const ProfileWalletDocument = {
  * const { data, loading, error } = useOwnedTokensQuery({
  *   variables: {
  *      owner: // value for 'owner'
- *      seller: // value for 'seller'
  *      limit: // value for 'limit'
  *      offset: // value for 'offset'
  *      filterByCollectionAddrs: // value for 'filterByCollectionAddrs'
- *      filterForSale: // value for 'filterForSale'
- *      sortBy: // value for 'sortBy'
  *   },
  * });
  */
@@ -2694,4 +2711,59 @@ export type ProfileWalletSuspenseQueryHookResult = ReturnType<
 export type ProfileWalletQueryResult = Apollo.QueryResult<
   ProfileWalletQuery,
   ProfileWalletQueryVariables
+>
+
+/**
+ * __useTokenQuery__
+ *
+ * To run a query within a React component, call `useTokenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTokenQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTokenQuery({
+ *   variables: {
+ *      collectionAddr: // value for 'collectionAddr'
+ *      tokenId: // value for 'tokenId'
+ *   },
+ * });
+ */
+export function useTokenQuery(
+  baseOptions: Apollo.QueryHookOptions<TokenQuery, TokenQueryVariables> &
+    ({ variables: TokenQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<TokenQuery, TokenQueryVariables>(
+    TokenDocument,
+    options
+  )
+}
+export function useTokenLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<TokenQuery, TokenQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<TokenQuery, TokenQueryVariables>(
+    TokenDocument,
+    options
+  )
+}
+export function useTokenSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<TokenQuery, TokenQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<TokenQuery, TokenQueryVariables>(
+    TokenDocument,
+    options
+  )
+}
+export type TokenQueryHookResult = ReturnType<typeof useTokenQuery>
+export type TokenLazyQueryHookResult = ReturnType<typeof useTokenLazyQuery>
+export type TokenSuspenseQueryHookResult = ReturnType<
+  typeof useTokenSuspenseQuery
+>
+export type TokenQueryResult = Apollo.QueryResult<
+  TokenQuery,
+  TokenQueryVariables
 >

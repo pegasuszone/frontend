@@ -18,6 +18,13 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.tooltip {
+  background-color: rgb(24, 24, 27) !important;
+  opacity: 1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 0.5rem !important;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
