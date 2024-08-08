@@ -3,14 +3,14 @@
 import { useSw } from '@/contexts/sw'
 import { CHAIN_ID, SWIFT_API, SWIFT_APP_ID } from '@/utils/constants'
 import { urlB64ToUint8Array } from '@/utils/format'
-import { StdTx } from '@cosmjs/amino'
+import { makeSignDoc, StdTx } from '@cosmjs/amino'
 import { BellIcon } from '@heroicons/react/24/outline'
 import {
   GetResponseType as AuthorizationsGetResponse,
   SetResponseType as AuthorizationsSetResponse,
 } from '@swiftprotocol/api/routes/notify/auth/types'
 import { VerifyResponseType } from '@swiftprotocol/api/routes/notify/verify/types'
-import { getWallet, useAccount } from 'graz'
+import { getWallet, useAccount, useOfflineSigners } from 'graz'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from '../catalyst/button'
 import { DropdownMenu } from '../catalyst/dropdown'
@@ -20,6 +20,7 @@ import Spinner from './Spinner'
 
 export default function NotificationDropdown() {
   const { data: account } = useAccount()
+  const { data: offlineSigners } = useOfflineSigners()
   const { registration } = useSw()
 
   const [isLoading, setIsLoading] = useState(true)
@@ -57,7 +58,7 @@ export default function NotificationDropdown() {
     }, [localStorage, account])
 
   const handleSign = useCallback(async () => {
-    if (!account) return
+    if (!offlineSigners || !account) return
 
     const wallet = getWallet()
     if (!wallet.signArbitrary) return
@@ -65,10 +66,34 @@ export default function NotificationDropdown() {
     const authMsg =
       'I am signing this message to authorize Pegasus to display push notifications on this device.'
 
-    const sig = await wallet.signArbitrary(
+    const signDoc = makeSignDoc(
+      [
+        {
+          type: 'sign/MsgSignData',
+          value: {
+            signer: account.bech32Address,
+            data: authMsg,
+          },
+        },
+      ],
+      {
+        gas: '0',
+        amount: [
+          {
+            denom: 'ustars',
+            amount: '0',
+          },
+        ],
+      },
       CHAIN_ID,
+      '',
+      0,
+      0
+    )
+
+    const sig = await offlineSigners.offlineSignerAmino.signAmino(
       account.bech32Address,
-      authMsg
+      signDoc
     )
 
     const walletSignature: StdTx = {
@@ -83,11 +108,11 @@ export default function NotificationDropdown() {
       ],
       fee: { gas: '0', amount: [] },
       memo: '',
-      signatures: [sig],
+      signatures: [sig.signature],
     }
 
     return walletSignature
-  }, [account])
+  }, [offlineSigners, account])
 
   const handleRegister = useCallback(async () => {
     if (!account) throw new Error('Cannot register without an account')
