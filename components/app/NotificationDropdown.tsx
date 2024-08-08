@@ -89,7 +89,14 @@ export default function NotificationDropdown() {
       ],
       {
         gas: '0',
-        amount: [],
+        amount: isMobile()
+          ? [
+              {
+                denom: 'ustars',
+                amount: '0',
+              },
+            ]
+          : [],
       },
       isMobile() ? CHAIN_ID : '',
       '',
@@ -97,7 +104,7 @@ export default function NotificationDropdown() {
       0
     )
 
-    console.log(signDoc)
+    console.log(CHAIN_ID, account.bech32Address, signDoc)
 
     const sig = await wallet.signAmino(CHAIN_ID, account.bech32Address, signDoc)
 
