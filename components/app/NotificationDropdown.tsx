@@ -96,6 +96,8 @@ export default function NotificationDropdown() {
       0
     )
 
+    console.log(signDoc)
+
     const sig = await wallet.signAmino(CHAIN_ID, account.bech32Address, signDoc)
 
     console.log(sig)
