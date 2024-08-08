@@ -1,3 +1,5 @@
+import issueOfferReceivedNotification from '@/server/issueOfferReceivedNotification'
+import issueOfferSentNotification from '@/server/issueOfferSentNotification'
 import { PegasusMsgComposer } from '@/types/Pegasus.message-composer'
 import { TokenMsg } from '@/types/Pegasus.types'
 import { CONTRACT_ADDRESS } from '@/utils/constants'
@@ -160,7 +162,11 @@ export function TradeProvider({ children }: { children: ReactNode }) {
       peer,
       wantedNfts: tokenMsg(selectedPeerTokens),
     })
-    await tx([...approveMsgs, createOffer], {}, () => router.push('/outbox'))
+    await tx([...approveMsgs, createOffer], {}, () => {
+      issueOfferSentNotification(account.bech32Address, peer)
+      issueOfferReceivedNotification(account.bech32Address, peer)
+      router.push('/offers')
+    })
   }
 
   return (

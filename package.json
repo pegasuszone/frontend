@@ -24,7 +24,7 @@
     "@heroicons/react": "^2.1.5",
     "@huner2/react-tooltip": "^4.2.22",
     "@leapwallet/cosmos-social-login-capsule-provider": "^0.0.39",
-    "@swiftprotocol/api": "^0.1.5",
+    "@swiftprotocol/api": "^0.1.7",
     "@tailwindcss/forms": "^0.5.7",
     "@tanstack/react-query": "^4",
     "clsx": "^2.1.1",
