@@ -66,16 +66,6 @@ export default function AppLayout({
 
   return (
     <>
-      <head>
-        <link
-          rel="manifest"
-          href="https://progressier.app/d1YRu9dGZ3sSjIKB6Xrk/progressier.json"
-        />
-        <script
-          defer
-          src="https://progressier.app/d1YRu9dGZ3sSjIKB6Xrk/script.js"
-        ></script>
-      </head>
       <Toaster position="bottom-center" />
       <ApolloProvider client={graphqlClient}>
         <QueryClientProvider client={queryClient}>
