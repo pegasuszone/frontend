@@ -11,6 +11,7 @@ import {
 } from '@swiftprotocol/api/routes/notify/auth/types'
 import { VerifyResponseType } from '@swiftprotocol/api/routes/notify/verify/types'
 import { getWallet, useAccount } from 'graz'
+import isMobile from 'is-mobile'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from '../catalyst/button'
 import { DropdownMenu } from '../catalyst/dropdown'
@@ -76,7 +77,7 @@ export default function NotificationDropdown() {
     const authMsg =
       'I am signing this message to authorize Pegasus to display push notifications on this device.'
 
-    const signDoc = makeSignDoc(
+    let signDoc = makeSignDoc(
       [
         {
           type: 'sign/MsgSignData',
@@ -90,7 +91,7 @@ export default function NotificationDropdown() {
         gas: '0',
         amount: [],
       },
-      '',
+      isMobile() ? CHAIN_ID : '',
       '',
       0,
       0
