@@ -71,7 +71,7 @@ export default function NotificationDropdown() {
 
     const wallet = getWallet()
     console.log(wallet)
-    if (!wallet.signArbitrary) return
+    if (!wallet.signAmino) throw new Error('Wallet does not support Amino')
 
     const authMsg =
       'I am signing this message to authorize Pegasus to display push notifications on this device.'
