@@ -4,6 +4,7 @@ import './globals.css'
 import AppLayout from '@/components/app/AppLayout'
 import PWAWrapper from '@/components/app/PWAWrapper'
 import { Metadata } from 'next'
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   title: 'Pegasus',
   description: 'Peer-to-peer NFT trading on Stargaze',
   generator: 'Next.js',
-  manifest: '/manifest.json',
+  manifest: 'https://progressier.app/d1YRu9dGZ3sSjIKB6Xrk/progressier.json',
   authors: [
     {
       name: 'Josef Leventon',
@@ -38,6 +39,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Script
+        defer
+        src="https://progressier.app/d1YRu9dGZ3sSjIKB6Xrk/script.js"
+      />
       <body className={inter.className}>
         <PWAWrapper>
           <AppLayout>{children}</AppLayout>

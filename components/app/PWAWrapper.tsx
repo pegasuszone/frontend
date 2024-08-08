@@ -1,10 +1,11 @@
 'use client'
 
 import { SwProvider } from '@/contexts/sw'
+import { Workbox } from 'workbox-window'
 
 declare global {
   interface Window {
-    workbox: ServiceWorkerContainer
+    workbox: Workbox
   }
 }
 

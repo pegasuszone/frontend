@@ -12,6 +12,7 @@ import { GrazProvider } from 'graz'
 import { stargaze, stargazetestnet } from 'graz/chains'
 import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
+import { Workbox } from 'workbox-window'
 
 export const queryClient = new QueryClient()
 
@@ -36,15 +37,20 @@ export default function AppLayout({
 
   useEffect(() => {
     console.log(window, window.workbox)
-    if (
-      typeof window !== 'undefined' &&
-      'serviceWorker' in navigator &&
-      window.workbox !== undefined
-    ) {
-      const wb = window.workbox
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      window.workbox = new Workbox(window.location.origin + '/sw.js', {
+        scope: '/',
+      })
 
-      wb.register('/service-worker.js')
+      window.workbox
+        .register()
         .then((registration) => {
+          if (!registration) {
+            return console.error(
+              'Service Worker registration could not be found.'
+            )
+          }
+
           console.log(
             'Service Worker registered with scope:',
             registration.scope
@@ -60,6 +66,16 @@ export default function AppLayout({
 
   return (
     <>
+      <head>
+        <link
+          rel="manifest"
+          href="https://progressier.app/d1YRu9dGZ3sSjIKB6Xrk/progressier.json"
+        />
+        <script
+          defer
+          src="https://progressier.app/d1YRu9dGZ3sSjIKB6Xrk/script.js"
+        ></script>
+      </head>
       <Toaster position="bottom-center" />
       <ApolloProvider client={graphqlClient}>
         <QueryClientProvider client={queryClient}>

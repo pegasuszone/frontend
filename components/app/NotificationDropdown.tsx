@@ -11,11 +11,12 @@ import {
 } from '@swiftprotocol/api/routes/notify/auth/types'
 import { VerifyResponseType } from '@swiftprotocol/api/routes/notify/verify/types'
 import { getWallet, useAccount } from 'graz'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button } from '../catalyst/button'
 import { DropdownMenu } from '../catalyst/dropdown'
 import { Heading } from '../catalyst/heading'
 import { Text } from '../catalyst/text'
+import Spinner from './Spinner'
 
 export default function NotificationDropdown() {
   const { data: account } = useAccount()
@@ -106,14 +107,23 @@ export default function NotificationDropdown() {
       },
     })
 
-    const auth: AuthorizationsGetResponse = await authorizationsResponse.json()
-    const pegasusAuthIndex = auth.authorizations.findIndex(
+    let authorizations: AuthorizationsGetResponse['authorizations']
+
+    if (authorizationsResponse.status !== 200) {
+      authorizations = []
+    } else {
+      const auth: AuthorizationsGetResponse =
+        await authorizationsResponse.json()
+      authorizations = auth.authorizations
+    }
+
+    const pegasusAuthIndex = authorizations.findIndex(
       (auth) => auth.app === SWIFT_APP_ID
     )
     if (pegasusAuthIndex >= 0) {
-      auth.authorizations[pegasusAuthIndex].methods = ['push']
+      authorizations[pegasusAuthIndex].methods = ['push']
     } else {
-      auth.authorizations.push({
+      authorizations.push({
         app: SWIFT_APP_ID,
         methods: ['push'],
       })
@@ -125,7 +135,7 @@ export default function NotificationDropdown() {
         method: 'POST',
         body: JSON.stringify({
           signature,
-          authorizations: auth.authorizations,
+          authorizations: authorizations,
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +151,7 @@ export default function NotificationDropdown() {
       await setAuthorizationsResponse.json()
     console.log(setAuth)
 
-    const subscription = registration.pushManager.subscribe({
+    const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: applicationServerKey,
     })
@@ -190,26 +200,48 @@ export default function NotificationDropdown() {
     return sub.subscription
   }, [account])
 
+  const [isLoading, setIsLoading] = useState(true)
+  const [subscription, setSubscription] = useState<PushSubscriptionJSON>()
+
+  useEffect(() => {
+    async function effect() {
+      const subscription = await handleRetrieveSubscription()
+      setSubscription(subscription)
+      setIsLoading(false)
+    }
+    effect()
+  }, [])
+
   return (
     <DropdownMenu>
       <div className="md:max-w-xs">
-        <div className="flex flex-col pt-4 w-full justify-center items-center">
-          <BellIcon className="h-12 w-12 text-black dark:text-white" />
-          <Heading level={2} className="mt-1">
-            Push Notifications
-          </Heading>
-          <Text className="text-center mt-1.5 lg:mt-0">
-            Sign this device up for push notifications whenever you receive or
-            send a new offer.
-          </Text>
-          <Button
-            onClick={handleRegister}
-            color="dark/white"
-            className="w-full mt-4 !cursor-pointer"
-          >
-            Sign up
-          </Button>
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center">
+            <Spinner className="w-8 h-8" />
+          </div>
+        ) : subscription ? (
+          <div className="flex flex-col w-full">
+            <Heading level={2}>Notifications</Heading>
+          </div>
+        ) : (
+          <div className="flex flex-col pt-4 w-full justify-center items-center">
+            <BellIcon className="h-12 w-12 text-black dark:text-white" />
+            <Heading level={2} className="mt-1">
+              Push Notifications
+            </Heading>
+            <Text className="text-center mt-1.5 lg:mt-0">
+              Sign this device up for push notifications whenever you receive or
+              send a new offer.
+            </Text>
+            <Button
+              onClick={handleRegister}
+              color="dark/white"
+              className="w-full mt-4 !cursor-pointer"
+            >
+              Sign up
+            </Button>
+          </div>
+        )}
       </div>
     </DropdownMenu>
   )
