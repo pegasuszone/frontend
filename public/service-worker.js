@@ -1,5 +1,3 @@
-importScripts("https://progressier.app/d1YRu9dGZ3sSjIKB6Xrk/sw.js");
-
 self.addEventListener('install', (event) => {
   console.log('Service Worker installed')
 })

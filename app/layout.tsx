@@ -39,10 +39,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Script
-        defer
-        src="https://progressier.app/d1YRu9dGZ3sSjIKB6Xrk/script.js"
-      />
+      <Script defer src="/progressier.js" />
       <body className={inter.className}>
         <PWAWrapper>
           <AppLayout>{children}</AppLayout>
