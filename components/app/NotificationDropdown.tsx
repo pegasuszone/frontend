@@ -22,6 +22,11 @@ export default function NotificationDropdown() {
   const { data: account } = useAccount()
   const { registration } = useSw()
 
+  const [isLoading, setIsLoading] = useState(true)
+  const [subscription, setSubscription] = useState<PushSubscriptionJSON>()
+  const [refreshCounter, setRefreshCounter] = useState(0)
+  const refresh = () => setRefreshCounter(refreshCounter + 1)
+
   const handleRetrieveSignature: () => Promise<StdTx> =
     useCallback(async () => {
       if (!account)
@@ -171,6 +176,8 @@ export default function NotificationDropdown() {
     if (subscribeResponse.status !== 200) {
       throw new Error('Failed to subscribe')
     }
+
+    refresh()
   }, [registration, account])
 
   const handleRetrieveSubscription: () => Promise<
@@ -200,9 +207,6 @@ export default function NotificationDropdown() {
     return sub.subscription
   }, [account])
 
-  const [isLoading, setIsLoading] = useState(true)
-  const [subscription, setSubscription] = useState<PushSubscriptionJSON>()
-
   useEffect(() => {
     async function effect() {
       const subscription = await handleRetrieveSubscription()
@@ -210,7 +214,7 @@ export default function NotificationDropdown() {
       setIsLoading(false)
     }
     effect()
-  }, [account])
+  }, [account, refreshCounter])
 
   return (
     <DropdownMenu>

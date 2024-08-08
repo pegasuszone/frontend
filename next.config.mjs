@@ -4,6 +4,12 @@ import pwa from 'next-pwa'
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["localhost:3000", "*.swiftprotocol.zone"],
+      allowedForwardedHosts: ["localhost:3000", "*.swiftprotocol.zone"],
+    }
+  },
   compiler: {
     removeConsole: process.env.NODE_ENV !== "development",
   },

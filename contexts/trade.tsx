@@ -165,7 +165,7 @@ export function TradeProvider({ children }: { children: ReactNode }) {
     await tx([...approveMsgs, createOffer], {}, () => {
       issueOfferSentNotification(account.bech32Address, peer)
       issueOfferReceivedNotification(account.bech32Address, peer)
-      router.push('/offers')
+      router.push('/outbox')
     })
   }
 

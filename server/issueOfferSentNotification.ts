@@ -14,14 +14,19 @@ export default async function issueOfferSentNotification(
   const publicKey = process.env.SWIFT_PUBLIC_KEY
   const appId = SWIFT_APP_ID
 
+  console.log('issueOfferSentNotification', user, peer)
+  console.log('keys', privateKey, publicKey)
+
   if (!privateKey) throw new Error('Missing Swift private key')
   if (!publicKey) throw new Error('Missing Swift public key')
 
   const signature = await signMessage(privateKey, appId.toString())
+  console.log('signature', signature)
   const notification = {
     title: 'Sent new offer',
     body: 'You have sent a new offer to ' + truncateAddress(peer),
   }
+  console.log('notification', notification)
 
   await fetch(`${SWIFT_API}/notify/push`, {
     method: 'POST',
