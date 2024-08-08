@@ -189,7 +189,7 @@ export default function Inbox() {
                     <p className="text-zinc-950 dark:text-white/80 text-sm">
                       Expires {expiresAt.toLocaleString()}
                     </p>
-                    <div className="flex flex-col lg:flex-row w-full lg:w-auto items-center space-y-2 lg:space-y-2 lg:space-x-4 mt-2">
+                    <div className="flex flex-col lg:flex-row w-full lg:w-auto items-center space-y-2 lg:space-y-0 lg:space-x-4 mt-2 lg:mt-0">
                       <Button
                         color="red"
                         className="cursor-pointer w-full lg:w-auto"
