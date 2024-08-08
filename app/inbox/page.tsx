@@ -121,9 +121,9 @@ export default function Inbox() {
       <Profile profile={profile} />
       <Divider className="my-8" />
       <div>
-        <Heading>Outbox</Heading>
+        <Heading className="mb-4">Inbox</Heading>
         {offers?.offers.length === 0 && (
-          <div className="border-zinc-950/10 mt-4 dark:border-white/10 border rounded-md p-4 lg:py-4 lg:px-8 flex space-y-4 lg:space-y-0 flex-col lg:flex-row justify-between items-center">
+          <div className="border-zinc-950/10 dark:border-white/10 border rounded-md p-4 lg:py-4 lg:px-8 flex space-y-4 lg:space-y-0 flex-col lg:flex-row justify-between items-center">
             <div>
               <Heading>Your inbox is empty</Heading>
               <Text>You do not have any incoming trade offers.</Text>
@@ -185,21 +185,21 @@ export default function Inbox() {
                     </div>
                   </div>
                   <Divider className="my-4" />
-                  <div className="flex flex-row justify-between items-center">
+                  <div className="flex flex-col lg:flex-row lg:justify-between items-center">
                     <p className="text-zinc-950 dark:text-white/80 text-sm">
                       Expires {expiresAt.toLocaleString()}
                     </p>
-                    <div className="flex flex-row items-center space-x-4">
+                    <div className="flex flex-col lg:flex-row w-full lg:w-auto items-center space-y-2 lg:space-y-2 lg:space-x-4 mt-2">
                       <Button
                         color="red"
-                        className="cursor-pointer"
+                        className="cursor-pointer w-full lg:w-auto"
                         onClick={() => handleRejectOffer(offer)}
                       >
                         Reject Offer
                       </Button>
                       <Button
                         color="dark/white"
-                        className="cursor-pointer"
+                        className="cursor-pointer w-full lg:w-auto"
                         onClick={() => handleAcceptOffer(offer)}
                       >
                         Accept Offer

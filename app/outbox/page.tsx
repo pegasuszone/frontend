@@ -96,9 +96,9 @@ export default function Outbox() {
       <Profile profile={profile} />
       <Divider className="my-8" />
       <div>
-        <Heading>Outbox</Heading>
+        <Heading className="mb-4">Outbox</Heading>
         {offers?.offers.length === 0 && (
-          <div className="border-zinc-950/10 mt-4 dark:border-white/10 border rounded-md p-4 lg:py-4 lg:px-8 flex space-y-4 lg:space-y-0 flex-col lg:flex-row justify-between items-center">
+          <div className="border-zinc-950/10 dark:border-white/10 border rounded-md p-4 lg:py-4 lg:px-8 flex space-y-4 lg:space-y-0 flex-col lg:flex-row justify-between items-center">
             <div>
               <Heading>Make an offer to get started</Heading>
               <Text>You do not have any outgoing trade offers.</Text>
@@ -163,7 +163,7 @@ export default function Outbox() {
                   </div>
                 </div>
                 <Divider className="my-4" />
-                <div className="flex flex-row justify-between items-center">
+                <div className="flex flex-col lg:flex-row lg:justify-between items-center">
                   <p
                     className={clsx(
                       expired
@@ -176,7 +176,7 @@ export default function Outbox() {
                     {expiresAt.toLocaleString()}
                   </p>
                   <Button
-                    className="cursor-pointer"
+                    className="cursor-pointer mt-2 lg:mt-0 w-full lg:w-auto"
                     onClick={() => handleRetractOffer(offer)}
                   >
                     Retract Offer
