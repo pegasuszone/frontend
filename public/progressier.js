@@ -7,9 +7,6 @@ var allScriptsInPage = document.querySelectorAll('script[src*="/client/script.js
 if (allScriptsInPage[0] !== currentScriptNode && allScriptsInPage.length > 1) {
     throw "You are initializing the Progressier script more than once. Please remove the additional instances to ensure Progressier works properly."
 }
-if (!allScriptsInPage.length) {
-    throw "The Progressier script must be initialized from the Progressier domain."
-}
 if (window.location.hostname === "localhost") {
     console.warn("Testing Progressier on localhost is strongly not recommended. Instead, use the equivalent IP address, i.e. http://" + window.location.host.replace("localhost", "127.0.0.1"))
 }
@@ -33,16 +30,9 @@ function ProgressierObj() {
         if (!t.script) {
             throw "Progressier Error: Couldn't retrieve currentScript. You may be using a browser that's incompatible with Progressier"
         }
-        this.appId = new URL(t.script).searchParams.get("id");
-        if (new URL(t.script).pathname.startsWith("/myapp")) {
-            t.appId = new URL(t.script).pathname.split("/")[2]
-        }
-        if (new URL(t.script).host === "progressier.app") {
-            t.appId = new URL(t.script).pathname.split("/")[1]
-        }
-        if (!t.appId) {
-            throw "Progressier Error: Missing app ID. The URL of the client script must include your app ID"
-        }
+        this.appId = 'd1YRu9dGZ3sSjIKB6Xrk'
+        t.appId = 'd1YRu9dGZ3sSjIKB6Xrk'
+        
         this.helpArticle = function(e) {
             return "https://intercom.help/progressier/en/articles/" + e
         };
