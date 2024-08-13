@@ -14,16 +14,6 @@ export const metadata: Metadata = {
   description: 'Peer-to-peer NFT trading on Stargaze',
   generator: 'Next.js',
   manifest: 'https://progressier.app/d1YRu9dGZ3sSjIKB6Xrk/progressier.json',
-  authors: [
-    {
-      name: 'Josef Leventon',
-      url: 'https://github.com/josefleventon',
-    },
-    {
-      name: 'Maurits Bos',
-      url: 'https://github.com/mbbrainz',
-    },
-  ],
   viewport:
     'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover, theme-color=#fff',
   icons: [

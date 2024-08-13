@@ -3,6 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "contributors": [
+    {
+      "name": "Josef Leventon",
+      "url": "https://github.com/josefleventon"
+    },
+    {
+      "name": "Maurits Bos",
+      "url": "https://github.com/mbbrainz"
+    }
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
