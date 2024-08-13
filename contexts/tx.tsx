@@ -1,8 +1,8 @@
-import { BLOCK_EXPLORER, CHAIN_ID } from '@/utils/constants'
+import { BLOCK_EXPLORER, CHAIN_ID, SUPPORTED_WALLETS } from '@/utils/constants'
 import { calculateFee, isDeliverTxSuccess } from '@cosmjs/stargate'
 import { ArrowTopRightOnSquareIcon as LinkIcon } from '@heroicons/react/24/outline'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
-import { useAccount, useCosmWasmSigningClient } from 'graz'
+import { useAccount, useActiveWalletType, useCosmWasmSigningClient } from 'graz'
 import { createContext, ReactNode, useContext } from 'react'
 import useToaster, { ToastPayload, ToastTypes } from './toast'
 
@@ -31,6 +31,7 @@ export const Tx = createContext<TxContext>({
 
 export function TxProvider({ children }: { children: ReactNode }) {
   const { data: account } = useAccount()
+  const { walletType } = useActiveWalletType()
   const { data: signingCosmWasmClient, refetch } = useCosmWasmSigningClient({
     chainId: CHAIN_ID,
   })
@@ -44,25 +45,43 @@ export function TxProvider({ children }: { children: ReactNode }) {
 
     if (!account || !signingCosmWasmClient) return
 
-    let simulateToastId = ''
+    const wallet = SUPPORTED_WALLETS.find((w) => w.type === walletType)
+    if (!wallet) {
+      toaster.toast({
+        title: 'Error',
+        message: 'Wallet not supported',
+        type: ToastTypes.Error,
+      })
+      return
+    }
 
-    simulateToastId = toaster.toast(
-      {
-        title: 'Simulating transaction...',
-        type: ToastTypes.Pending,
-      },
-      { duration: 999999 }
-    )
+    let gas: number
 
-    const gas = await signingCosmWasmClient.simulate(
-      account.bech32Address,
-      msgs,
-      undefined
-    )
+    if (wallet.isMobile) {
+      gas = 300000
+    } else {
+      let simulateToastId = ''
+
+      simulateToastId = toaster.toast(
+        {
+          title: 'Simulating transaction...',
+          type: ToastTypes.Pending,
+        },
+        { duration: 999999 }
+      )
+
+      gas = await signingCosmWasmClient.simulate(
+        account.bech32Address,
+        msgs,
+        undefined
+      )
+
+      toaster.dismiss(simulateToastId)
+    }
+
+    console.log(gas)
 
     const fee = calculateFee(Math.round(gas * 1.4), '0ustars')
-
-    toaster.dismiss(simulateToastId)
 
     let signed
     try {
